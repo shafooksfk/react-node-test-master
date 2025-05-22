@@ -5,6 +5,7 @@ import MultiLeadModel from 'components/commonTableModel/MultiLeadModel';
 import Spinner from 'components/spinner/Spinner';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { LiaMousePointerSolid } from 'react-icons/lia';
 import { useSelector } from 'react-redux';
@@ -43,13 +44,35 @@ const AddMeeting = (props) => {
         initialValues: initialValues,
         validationSchema: MeetingSchema,
         onSubmit: (values, { resetForm }) => {
-            
+            AddData()
+            resetForm()
         },
     });
     const { errors, touched, values, handleBlur, handleChange, handleSubmit, setFieldValue } = formik
 
     const AddData = async () => {
+        try {
+            setIsLoding(true)
 
+            if (values?.start) {
+                values.start = values?.allDay ? moment(values?.start).format('YYYY-MM-DD') : moment(values?.start).format('YYYY-MM-DD HH:mm');
+            }
+            if (values?.end) {
+                values.end = values?.allDay ? moment(values?.end).format('YYYY-MM-DD') : moment(values?.end).format('YYYY-MM-DD HH:mm');
+            }
+
+            let response = await postApi('api/meeting/add', values)
+            if (response.status === 200) {
+                formik.resetForm()
+                onClose();
+                fetchData(1)
+            }
+        } catch (e) {
+            console.log(e);
+        }
+        finally {
+            setIsLoding(false)
+        }
     };
 
     const fetchAllData = async () => {
