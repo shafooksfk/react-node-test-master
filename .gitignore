@@ -7,8 +7,8 @@ build
 Client/node_modules
 server/node_modules
 server/uploads
-server/.env
-Client/.env
+# server/.env
+# Client/.env
 
 /.pnp
 .pnp.js
