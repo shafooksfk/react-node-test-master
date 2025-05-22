@@ -26,7 +26,6 @@ const add = async (req, res) => {
     if (attendesLead && !isValidObjectIds(attendesLead)) {
       res.status(400).json({ error: "Invalid attendesLead value" });
     }
-    console.log("reaches here");
     // Create meeting document
     const meeting = new MeetingHistory({
       agenda,
@@ -119,7 +118,7 @@ const index = async (req, res) => {
     ]);
     res.send(result);
   } catch (error) {
-    console.log("Error:", error);
+    console.error("Error:", error);
     res.status(500).send("Internal Server Error");
   }
 };

@@ -11,7 +11,7 @@ import { LiaMousePointerSolid } from 'react-icons/lia';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { MeetingSchema } from 'schema';
-import { getApi, postApi } from 'services/api';
+import { postApi } from 'services/api';
 
 const AddMeeting = (props) => {
     const { onClose, isOpen, setAction, from, fetchData, view } = props
@@ -44,44 +44,45 @@ const AddMeeting = (props) => {
         initialValues: initialValues,
         validationSchema: MeetingSchema,
         onSubmit: (values, { resetForm }) => {
-            AddData()
+            AddData(values)
             resetForm()
         },
     });
     const { errors, touched, values, handleBlur, handleChange, handleSubmit, setFieldValue } = formik
 
-    const AddData = async () => {
+    const AddData = async (values) => {
         try {
-            setIsLoding(true)
+        setIsLoding(true);
 
-            if (values?.start) {
-                values.start = values?.allDay ? moment(values?.start).format('YYYY-MM-DD') : moment(values?.start).format('YYYY-MM-DD HH:mm');
-            }
-            if (values?.end) {
-                values.end = values?.allDay ? moment(values?.end).format('YYYY-MM-DD') : moment(values?.end).format('YYYY-MM-DD HH:mm');
-            }
-
-            let response = await postApi('api/meeting/add', values)
-            if (response.status === 200) {
-                formik.resetForm()
-                onClose();
-                fetchData(1)
-            }
-        } catch (e) {
-            console.log(e);
+        if (values?.start) {
+            values.start = values?.allDay
+            ? moment(values?.start).format("YYYY-MM-DD")
+            : moment(values?.start).format("YYYY-MM-DD HH:mm");
         }
-        finally {
-            setIsLoding(false)
+        if (values?.end) {
+            values.end = values?.allDay
+            ? moment(values?.end).format("YYYY-MM-DD")
+            : moment(values?.end).format("YYYY-MM-DD HH:mm");
+        }
+
+        let response = await postApi("api/meeting/add", values);
+        if (response.status === 201) {
+            formik.resetForm();
+            onClose();
+            setAction((pre) => !pre);
+        } else {
+            toast.error("Failed to create new meeting", "error");
+        }
+        } catch (e) {
+        console.log(e);
+        } finally {
+        setIsLoding(false);
         }
     };
 
-    const fetchAllData = async () => {
-        
-    }
+    // useEffect(() => {
 
-    useEffect(() => {
-
-    }, [props.id, values.related])
+    // }, [props.id, values.related])
 
     const extractLabels = (selectedItems) => {
         return selectedItems.map((item) => item._id);
